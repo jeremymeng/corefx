@@ -230,7 +230,7 @@ namespace System.Net.Sockets
                 }
                 catch (Exception exception)
                 {
-                    if (!ExceptionCheck.IsFatal(exception))
+                    if (!ExceptionCheck.IsFatal(exception) && GlobalLog.IsEnabled)
                     {
                         GlobalLog.Assert("SafeCloseSocket::ReleaseHandle(handle:" + handle.ToString("x") + ")", exception.Message);
                     }
@@ -241,7 +241,10 @@ namespace System.Net.Sockets
                 {
                     _closeSocketThread = Environment.CurrentManagedThreadId;
                     _closeSocketTick = Environment.TickCount;
-                    GlobalLog.Assert(ret, "SafeCloseSocket::ReleaseHandle(handle:{0:x})|ReleaseHandle failed.", handle);
+                    if (!ret)
+                    {
+                        GlobalLog.AssertFormat("SafeCloseSocket::ReleaseHandle(handle:{0:x})|ReleaseHandle failed.", handle);
+                    }
                 }
 #endif
             }
