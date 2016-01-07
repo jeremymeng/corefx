@@ -111,7 +111,7 @@ namespace System.Net.Sockets
 
             try
             {
-                chkSocket.Close(0);
+                chkSocket.Dispose();
             }
             catch (ObjectDisposedException)
             {
@@ -519,25 +519,6 @@ namespace System.Net.Sockets
 #endif
         }
 
-        private int _closeTimeout = Socket.DefaultCloseTimeout; // 1 ms; -1 = respect linger options
-
-        public void Close(int timeout)
-        {
-#if DEBUG
-            using (GlobalLog.SetThreadKind(ThreadKinds.User | ThreadKinds.Sync))
-            {
-#endif
-                if (timeout < -1)
-                {
-                    throw new ArgumentOutOfRangeException("timeout");
-                }
-                _closeTimeout = timeout;
-                Dispose();
-#if DEBUG
-            }
-#endif
-        }
-
         private volatile bool _cleanedUp = false;
         protected override void Dispose(bool disposing)
         {
@@ -568,7 +549,7 @@ namespace System.Net.Sockets
                             if (chkStreamSocket != null)
                             {
                                 chkStreamSocket.InternalShutdown(SocketShutdown.Both);
-                                chkStreamSocket.Close(_closeTimeout);
+                                chkStreamSocket.Dispose();
                             }
                         }
                     }
@@ -1037,8 +1018,11 @@ namespace System.Net.Sockets
         private int _currentWriteTimeout = -1;
         internal void SetSocketTimeoutOption(SocketShutdown mode, int timeout, bool silent)
         {
-            GlobalLog.Print("NetworkStream#" + Logging.HashString(this) + "::SetSocketTimeoutOption() mode:" + mode + " silent:" + silent + " timeout:" + timeout + " m_CurrentReadTimeout:" + _currentReadTimeout + " m_CurrentWriteTimeout:" + _currentWriteTimeout);
-            GlobalLog.ThreadContract(ThreadKinds.Unknown, "NetworkStream#" + Logging.HashString(this) + "::SetSocketTimeoutOption");
+            if (GlobalLog.IsEnabled)
+            {
+                GlobalLog.Print("NetworkStream#" + LoggingHash.HashString(this) + "::SetSocketTimeoutOption() mode:" + mode + " silent:" + silent + " timeout:" + timeout + " m_CurrentReadTimeout:" + _currentReadTimeout + " m_CurrentWriteTimeout:" + _currentWriteTimeout);
+            }
+            GlobalLog.ThreadContract(ThreadKinds.Unknown, "NetworkStream#" + LoggingHash.HashString(this) + "::SetSocketTimeoutOption");
 
             if (timeout < 0)
             {
@@ -1073,7 +1057,11 @@ namespace System.Net.Sockets
         {
             if (_streamSocket != null)
             {
-                GlobalLog.Print("_streamSocket:");
+                if (GlobalLog.IsEnabled)
+                {
+                    GlobalLog.Print("_streamSocket:");
+                }
+
                 _streamSocket.DebugMembers();
             }
         }
