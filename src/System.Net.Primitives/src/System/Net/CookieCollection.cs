@@ -239,10 +239,13 @@ namespace System.Net
 #if DEBUG
         internal void Dump()
         {
-            GlobalLog.Print("CookieCollection:");
-            foreach (Cookie cookie in this)
+            if (GlobalLog.IsEnabled)
             {
-                cookie.Dump();
+                GlobalLog.Print("CookieCollection:");
+                foreach (Cookie cookie in this)
+                {
+                    cookie.Dump();
+                }
             }
         }
 #endif
