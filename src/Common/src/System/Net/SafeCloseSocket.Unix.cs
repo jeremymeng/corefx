@@ -18,6 +18,7 @@ namespace System.Net.Sockets
     {
         private int _receiveTimeout = -1;
         private int _sendTimeout = -1;
+        private bool _nonBlocking;
 
         public SocketAsyncContext AsyncContext
         {
@@ -37,7 +38,26 @@ namespace System.Net.Sockets
             }
         }
 
-        public bool IsNonBlocking { get; set; }
+        public bool IsNonBlocking
+        {
+            get
+            {
+                return _nonBlocking;
+            }
+            set
+            {
+                _nonBlocking = value;
+
+                //
+                // If transitioning to non-blocking, we need to set the native socket to non-blocking mode.
+                // If we ever transition back to blocking, we keep the native socket in non-blocking mode, and emulate
+                // blocking.  This avoids problems with switching to native blocking while there are pending async
+                // operations.
+                //
+                if (value)
+                    _innerSocket.SetNonBlocking();
+            }
+        }
 
         public int ReceiveTimeout
         {
@@ -92,6 +112,11 @@ namespace System.Net.Sockets
         internal sealed partial class InnerSafeCloseSocket : SafeHandleMinusOneIsInvalid
         {
             private SocketAsyncContext _asyncContext;
+
+            public void SetNonBlocking()
+            {
+                _asyncContext.SetNonBlocking();
+            }
 
             public SocketAsyncContext AsyncContext
             {
@@ -211,16 +236,8 @@ namespace System.Net.Sockets
 
                     errorCode = SocketError.Success;
 
-                    // The socket was created successfully; make it non-blocking and enable
-                    // IPV6_V6ONLY by default for AF_INET6 sockets.
-                    int err = Interop.Sys.Fcntl.SetIsNonBlocking(fd, 1);
-                    if (err != 0)
-                    {
-                        Interop.Sys.Close(fd);
-                        fd = -1;
-                        errorCode = SocketError.SocketError;
-                    }
-                    else if (addressFamily == AddressFamily.InterNetworkV6)
+                    // The socket was created successfully; enable IPV6_V6ONLY by default for AF_INET6 sockets.
+                    if (addressFamily == AddressFamily.InterNetworkV6)
                     {
                         int on = 1;
                         error = Interop.Sys.SetSockOpt(fd, SocketOptionLevel.IPv6, SocketOptionName.IPv6Only, (byte*)&on, sizeof(int));

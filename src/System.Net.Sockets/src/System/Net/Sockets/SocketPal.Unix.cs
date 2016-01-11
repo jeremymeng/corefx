@@ -468,20 +468,9 @@ namespace System.Net.Sockets
             {
                 Debug.Assert(fd != -1);
 
-                // If the accept completed successfully, ensure that the accepted socket is non-blocking.
-                int err = Interop.Sys.Fcntl.SetIsNonBlocking(fd, 1);
-                if (err == 0)
-                {
-                    socketAddressLen = sockAddrLen;
-                    errorCode = SocketError.Success;
-                    acceptedFd = fd;
-                }
-                else
-                {
-                    errorCode = GetSocketErrorForErrorCode(Interop.Sys.GetLastError());
-                    acceptedFd = -1;
-                    Interop.Sys.Close(fd);
-                }
+                socketAddressLen = sockAddrLen;
+                errorCode = SocketError.Success;
+                acceptedFd = fd;
 
                 return true;
             }
@@ -720,10 +709,6 @@ namespace System.Net.Sockets
 
         public static SocketError SetBlocking(SafeCloseSocket handle, bool shouldBlock, out bool willBlock)
         {
-            // NOTE: since we need to emulate blocking I/O on *nix (!), this does NOT change the blocking
-            //       mode of the socket. Instead, it toggles a bit on the handle to indicate whether or not
-            //       the PAL methods with blocking semantics should retry in the case of an operation that
-            //       cannot be completed synchronously.
             handle.IsNonBlocking = !shouldBlock;
             willBlock = shouldBlock;
             return SocketError.Success;
