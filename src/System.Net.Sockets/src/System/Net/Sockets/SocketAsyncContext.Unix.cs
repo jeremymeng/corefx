@@ -561,7 +561,7 @@ namespace System.Net.Sockets
             }
         }
 
-        private bool TryBeginOperation<TOperation>(ref OperationQueue<TOperation> queue, TOperation operation, Interop.Sys.SocketEvents events, SafeCloseSocket safeCloseSocket, out bool isStopped)
+        private bool TryBeginOperation<TOperation>(ref OperationQueue<TOperation> queue, TOperation operation, Interop.Sys.SocketEvents events, out bool isStopped)
             where TOperation : AsyncOperation
         {
             // Async operations require the native socket to be in non-blocking mode.
