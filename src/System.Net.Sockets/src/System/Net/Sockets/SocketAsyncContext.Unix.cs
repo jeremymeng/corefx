@@ -564,9 +564,6 @@ namespace System.Net.Sockets
         private bool TryBeginOperation<TOperation>(ref OperationQueue<TOperation> queue, TOperation operation, Interop.Sys.SocketEvents events, out bool isStopped)
             where TOperation : AsyncOperation
         {
-            // Async operations require the native socket to be in non-blocking mode.
-            SetNonBlocking();
-
             lock (_queueLock)
             {
                 switch (queue.State)
@@ -663,6 +660,8 @@ namespace System.Net.Sockets
             Debug.Assert(socketAddressLen > 0);
             Debug.Assert(callback != null);
 
+            SetNonBlocking();
+
             int acceptedFd;
             SocketError errorCode;
             if (SocketPal.TryCompleteAccept(_fileDescriptor, socketAddress, ref socketAddressLen, out acceptedFd, out errorCode))
@@ -751,6 +750,8 @@ namespace System.Net.Sockets
             Debug.Assert(socketAddress != null);
             Debug.Assert(socketAddressLen > 0);
             Debug.Assert(callback != null);
+
+            SetNonBlocking();
 
             SocketError errorCode;
             if (SocketPal.TryStartConnect(_fileDescriptor, socketAddress, socketAddressLen, out errorCode))
@@ -855,6 +856,8 @@ namespace System.Net.Sockets
 
         public SocketError ReceiveFromAsync(byte[] buffer, int offset, int count, SocketFlags flags, byte[] socketAddress, int socketAddressLen, Action<int, byte[], int, SocketFlags, SocketError> callback)
         {
+            SetNonBlocking();
+
             int bytesReceived;
             SocketFlags receivedFlags;
             SocketError errorCode;
@@ -967,6 +970,8 @@ namespace System.Net.Sockets
 
         public SocketError ReceiveFromAsync(IList<ArraySegment<byte>> buffers, SocketFlags flags, byte[] socketAddress, int socketAddressLen, Action<int, byte[], int, SocketFlags, SocketError> callback)
         {
+            SetNonBlocking();
+
             int bytesReceived;
             SocketFlags receivedFlags;
             SocketError errorCode;
@@ -1076,6 +1081,8 @@ namespace System.Net.Sockets
 
         public SocketError ReceiveMessageFromAsync(byte[] buffer, int offset, int count, SocketFlags flags, byte[] socketAddress, int socketAddressLen, bool isIPv4, bool isIPv6, Action<int, byte[], int, SocketFlags, IPPacketInformation, SocketError> callback)
         {
+            SetNonBlocking();
+
             int bytesReceived;
             SocketFlags receivedFlags;
             IPPacketInformation ipPacketInformation;
@@ -1187,6 +1194,8 @@ namespace System.Net.Sockets
 
         public SocketError SendToAsync(byte[] buffer, int offset, int count, SocketFlags flags, byte[] socketAddress, int socketAddressLen, Action<int, byte[], int, SocketFlags, SocketError> callback)
         {
+            SetNonBlocking();
+
             int bytesSent = 0;
             SocketError errorCode;
             if (SocketPal.TryCompleteSendTo(_fileDescriptor, buffer, ref offset, ref count, flags, socketAddress, socketAddressLen, ref bytesSent, out errorCode))
@@ -1294,6 +1303,8 @@ namespace System.Net.Sockets
 
         public SocketError SendToAsync(IList<ArraySegment<byte>> buffers, SocketFlags flags, byte[] socketAddress, int socketAddressLen, Action<int, byte[], int, SocketFlags, SocketError> callback)
         {
+            SetNonBlocking();
+
             int bufferIndex = 0;
             int offset = 0;
             int bytesSent = 0;
