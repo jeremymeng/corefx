@@ -554,7 +554,7 @@ namespace System.Net.Sockets
             //
             if (!_nonBlockingSet)
             {
-                if (Interop.Sys.Fcntl.SetIsNonBlocking((IntPtr)_fileDescriptor, 1) != 0)
+                if (Interop.Sys.Fcntl.SetIsNonBlocking(_fileDescriptor, 1) != 0)
                     throw new SocketException((int)SocketPal.GetSocketErrorForErrorCode(Interop.Sys.GetLastError()));
 
                 _nonBlockingSet = true;
