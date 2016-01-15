@@ -40,7 +40,7 @@ namespace System.Net
         ///    Adds a <see cref='System.Net.NetworkCredential'/> instance to the credential cache.
         ///  </para>
         /// </devdoc>
-        public void Add(Uri uriPrefix, string authType, NetworkCredential cred)
+        public void Add(Uri uriPrefix, string authType, NetworkCredential credential)
         {
             // Parameter validation
             if (uriPrefix == null)
@@ -61,8 +61,8 @@ namespace System.Net
                 GlobalLog.Print("CredentialCache::Add() Adding key:[" + key.ToString() + "], cred:[" + credential.Domain + "],[" + credential.UserName + "]");
             }
 
-            _cache.Add(key, cred);
-            if (cred is SystemNetworkCredential)
+            _cache.Add(key, credential);
+            if (credential is SystemNetworkCredential)
             {
                 ++_numbDefaultCredInCache;
             }
@@ -177,13 +177,13 @@ namespace System.Net
         ///    authentication type.
         ///  </para>
         /// </devdoc>
-        public NetworkCredential GetCredential(Uri uriPrefix, string authType)
+        public NetworkCredential GetCredential(Uri uriPrefix, string authenticationType)
         {
             if (uriPrefix == null)
             {
                 throw new ArgumentNullException("uriPrefix");
             }
-            if (authType == null)
+            if (authenticationType == null)
             {
                 throw new ArgumentNullException("authType");
             }
@@ -204,7 +204,7 @@ namespace System.Net
                 CredentialKey key = (CredentialKey)credEnum.Key;
 
                 // Determine if this credential is applicable to the current Uri/AuthType
-                if (key.Match(uriPrefix, authType))
+                if (key.Match(uriPrefix, authenticationType))
                 {
                     int prefixLen = key.UriPrefixLength;
 
@@ -438,7 +438,7 @@ namespace System.Net
 
             if (GlobalLog.IsEnabled)
             {
-                GlobalLog.Print("CredentialKey::Equals(" + ToString() + ", " + other.ToString() + ") returns " + equals.ToString());
+                GlobalLog.Print("CredentialKey::Equals(" + ToString() + ", " + comparand.ToString() + ") returns " + equals.ToString());
             }
             return equals;
         }
@@ -540,7 +540,7 @@ namespace System.Net
 
             if (GlobalLog.IsEnabled)
             {
-                GlobalLog.Print("CredentialKey::Equals(" + ToString() + ", " + other.ToString() + ") returns " + equals.ToString());
+                GlobalLog.Print("CredentialKey::Equals(" + ToString() + ", " + comparand.ToString() + ") returns " + equals.ToString());
             }
             return equals;
         }
