@@ -1,11 +1,13 @@
 {
-  "dependencies": {
-    "System.Diagnostics.Contracts": "4.0.0-*",
-    "System.Threading": "4.0.0-*",
-    "System.Net.Primitives": "4.0.10-beta-*",
-    "System.Security.Cryptography.OpenSsl": "4.0.0-beta-*",
-    "System.Security.Cryptography.X509Certificates": "4.0.0-beta-*"
-  },
+    "dependencies": {
+        "System.Diagnostics.Contracts": "4.0.0-beta-23420",
+        "System.Threading": "4.0.10",
+        "System.Threading.ThreadPool": "4.0.10-beta-23420",
+        "System.Net.Primitives": "4.0.10-beta-23420",
+        "System.Security.Cryptography.OpenSsl": "4.0.0-beta-23420",
+        "System.Security.Cryptography.X509Certificates": "4.0.0-beta-23420",
+        "System.Security.Principal.Windows": "4.0.0-beta-23420"
+    },
   "frameworks": {
     "dnxcore50": {}
   }
