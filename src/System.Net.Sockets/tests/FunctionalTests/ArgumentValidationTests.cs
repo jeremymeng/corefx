@@ -213,7 +213,7 @@ namespace System.Net.Sockets.Tests
         [Fact]
         public void Close_TimeoutLessThanNegativeOne_ArgumentOutOfRange()
         {
-            Assert.Throws<ArgumentOutOfRangeException>(() => GetSocket().Close(-2));
+            Assert.Throws<ArgumentOutOfRangeException>(() => GetSocket().Dispose());
         }
 
         [Fact]
